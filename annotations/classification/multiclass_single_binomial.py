@@ -39,7 +39,7 @@ from ...util.taxonomy import Taxonomy
 
 import ctypes
 from numpy.ctypeslib import ndpointer
-lib = np.ctypeslib.load_library("annoprobs", os.path.dirname(__file__))
+lib = np.ctypeslib.load_library("libannoprobs.dylib", "/Users/scottloarie/crowdsourcing/annotations/classification")
 get_class_lls = lib.compute_log_likelihoods
 get_class_lls.restype = None
 get_class_lls.argtypes = [
@@ -856,38 +856,38 @@ class CrowdImageMulticlassSingleBinomial(CrowdImage):
         # DEBUGGING stuff
         if False: #worker_labels.shape[0] > 1: #self.id == '4892227':
             y_int = worker_labels[0]
-            print "Label: %d" % y_int
-            print "Worker Data:"
+            print("Label: %d" % y_int)
+            print("Worker Data:")
             for w in range(num_workers):
-                print "Response %d, PPR %0.5f (max PPR %0.5f at %d)" % (worker_labels[w], prob_prior_responses[w, y_int], np.max(prob_prior_responses[w]), np.argmax(prob_prior_responses[w]))
+                print("Response %d, PPR %0.5f (max PPR %0.5f at %d)" % (worker_labels[w], prob_prior_responses[w, y_int], np.max(prob_prior_responses[w]), np.argmax(prob_prior_responses[w])))
 
             l = worker_labels[0] + 1 # we subtracted one above
             l_node_list = self.params.root_to_node_path_list[l]
 
-            print "Worker PPR ancestor values:"
+            print("Worker PPR ancestor values:")
             for w in range(num_workers):
-                print ["%0.5f" % prob_prior_responses[w, a - 1] for a in l_node_list[1:]]
+                print(["%0.5f" % prob_prior_responses[w, a - 1] for a in l_node_list[1:]])
 
-            print "Worker Skill Perception P:"
+            print("Worker Skill Perception P:")
             l = l - 1
             for w in range(num_workers):
-                print ["%0.5f" % x for x in P[w][M_offset_indices[l]:M_offset_indices[l] + num_siblings[l]].tolist()]
+                print(["%0.5f" % x for x in P[w][M_offset_indices[l]:M_offset_indices[l] + num_siblings[l]].tolist()])
 
-            print "Worker Skill Perception R (ancestors to label):"
+            print("Worker Skill Perception R (ancestors to label):")
             for w in range(num_workers):
-                print ["%0.5f" % R[w][a - 1] for a in l_node_list[1:]]
+                print(["%0.5f" % R[w][a - 1] for a in l_node_list[1:]])
 
             parent_node = self.params.taxonomy.nodes[self.params.integer_id_to_orig_node_key[y_int + 1]].parent
             sibling_int_ids = [self.params.orig_node_key_to_integer_id[c_key] for c_key in parent_node.children]
-            print "Sibling node int ids ", sibling_int_ids
+            print("Sibling node int ids ", sibling_int_ids)
 
-            print "Worker skill Perception R (siblings to label):"
+            print("Worker skill Perception R (siblings to label):")
             for w in range(num_workers):
-                print ["%0.5f" % R[w][s - 1] for s in sibling_int_ids]
+                print(["%0.5f" % R[w][s - 1] for s in sibling_int_ids])
 
-            print "Probability of prior response of sibling nodes:"
+            print("Probability of prior response of sibling nodes:")
             for w in range(num_workers):
-                print ["%0.5f" % prob_prior_responses[w][s - 1] for s in sibling_int_ids]
+                print(["%0.5f" % prob_prior_responses[w][s - 1] for s in sibling_int_ids])
 
 
 

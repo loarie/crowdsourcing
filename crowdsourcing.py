@@ -615,7 +615,7 @@ class CrowdDataset(object):
                 for anno in annos:
                     try:
                         t = datetime.datetime.strptime(anno['created_at'],
-                                                       '%Y-%m-%d %H:%M:%S.%f')
+                                                       '%Y-%m-%dT%H:%M:%S.%fZ')
                     except ValueError:
                         t = datetime.datetime.strptime(anno['created_at'],
                                                        '%Y-%m-%d %H:%M:%S')
