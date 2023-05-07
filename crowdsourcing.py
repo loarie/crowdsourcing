@@ -585,7 +585,7 @@ class CrowdDataset(object):
         if fname is not None:
             self.fname = fname
             with open(fname) as f:
-                data = json.load(f)
+                data = json.load(f, object_hook=lambda d: {int(k) if k.lstrip('-').isdigit() else k: v for k, v in d.items()})
                 
         #self.images = {} #NOTE: I don't think we want to reset the images here.
         if overwrite_workers:
