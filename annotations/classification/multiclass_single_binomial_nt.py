@@ -354,7 +354,7 @@ class CrowdImageMulticlass(CrowdImage):
 
                 # if self.id == '1112246':
                 #     for c in range(num_classes):
-                #         print "class %d, worker %d, prob anno = %0.3f, prob pre anno = %0.3f, prob = %0.3f" % (c, wind, pc, ppr, num[c])
+                #         print("class %d, worker %d, prob anno = %0.3f, prob pre anno = %0.3f, prob = %0.3f" % (c, wind, pc, ppr, num[c]))
 
                 # Create the denominator
                 diag = pc * prob_prior_responses[wind]
@@ -367,8 +367,8 @@ class CrowdImageMulticlass(CrowdImage):
 
                 if self.id == '1112246':
                     for c in range(num_classes):
-                        #print "class %d, worker %d, num = %0.3f, denom = %0.3f, prob = %0.3f" % (c, wind, num[c], denom[c], probs[wind][c])
-                        print "p(z = %d | y = %d, H, w = %d) = %0.3f / %0.3f = %0.3f" % (wl, c, wind, num[c], denom[c], probs[wind][c])
+                        #print("class %d, worker %d, num = %0.3f, denom = %0.3f, prob = %0.3f" % (c, wind, num[c], denom[c], probs[wind][c]))
+                        print("p(z = %d | y = %d, H, w = %d) = %0.3f / %0.3f = %0.3f" % (wl, c, wind, num[c], denom[c], probs[wind][c]))
             #print
             # Compute log(p(y)) + Sum( log(p(z_j | y, H, w)) )
             lprobs = np.log(probs).sum(axis = 0)
@@ -417,33 +417,30 @@ class CrowdImageMulticlass(CrowdImage):
         self.risk = 1. - prob_y
 
         if self.id == '1112246':
-            print "Most likely classes:"
-            print y_labels
-            print "Log likelihoods:"
-            print lls
-            print "Log Class priors"
-            print log_class_probs[y_labels]
-            print "Log Anno Probs"
-            print lprobs[y_labels]
-            print "Prob y"
-            print prob_y
-            print "Worker Anno Probs"
-            print probs
+            print("Most likely classes:")
+            print(y_labels)
+            print("Log likelihoods:")
+            print(lls)
+            print("Log Class priors")
+            print(log_class_probs[y_labels])
+            print("Log Anno Probs")
+            print(lprobs[y_labels])
+            print("Prob y")
+            print(prob_y)
+            print("Worker Anno Probs")
+            print(probs)
 
-            #print
-            #print np.log(probs).sum(axis=0)[y_labels][:2]
-            #print np.log(prob_prior_responses).sum(axis=0)[y_labels][:2]
-            #print
+            #print(np.log(probs).sum(axis=0)[y_labels][:2])
+            #print(np.log(prob_prior_responses).sum(axis=0)[y_labels][:2])
+            
 
-            #print
-            #print np.log(probs)[:,y_labels][:,:2]
-            #print np.log(prob_prior_responses)[:,y_labels][:,:2]
-            #print
-            print "Worker info:"
-            print num_workers
-            print worker_labels
-            print worker_prob_correct
-            print worker_prob_trust
+            #print(np.log(probs)[:,y_labels][:,:2])
+            #print(np.log(prob_prior_responses)[:,y_labels][:,:2])
+            print("Worker info:")
+            print(num_workers)
+            print(worker_labels)
+            print(worker_prob_correct)
+            print(worker_prob_trust)
 
     def compute_log_likelihood(self):
         """Compute the log likelihood of the predicted label given the prior that the class is present.

@@ -256,7 +256,7 @@ class CrowdDataset(object):
     def crowdsource_simple(self, avoid_if_finished=False):
         """ Set the predicted labels to the consensus median.
         """
-        for image in self.images.itervalues():
+        for image in self.images.values():
             image.crowdsource_simple(avoid_if_finished=avoid_if_finished)
 
     def estimate_priors(self, gt_dataset=None):
@@ -295,7 +295,7 @@ class CrowdDataset(object):
             self.initialize_parameters(avoid_if_finished=avoid_if_finished)
 
             # Get updated image labels
-            for image in self.images.itervalues():
+            for image in self.images.values():
                 image.predict_true_labels(avoid_if_finished=avoid_if_finished)
 
             # Get CrowdLabels from the computer vision system
@@ -311,7 +311,7 @@ class CrowdDataset(object):
         # Maximum likelihood estimation
         log_likelihood = -np.inf
         old_likelihood = -np.inf
-        for it in xrange(max_iters):
+        for it in range(max_iters):
 
             # Update our estimate of the dataset wide priors
             if self.estimate_priors_automatically:
@@ -323,7 +323,7 @@ class CrowdDataset(object):
 
             # Estimate label predictions in each image using worker labels and
             # current worker parameters
-            for i, image in enumerate(self.images.itervalues()):
+            for i, image in enumerate(self.images.values()):
                 image.predict_true_labels(avoid_if_finished=avoid_if_finished)
 
                 if self.debug > 1:
@@ -334,18 +334,18 @@ class CrowdDataset(object):
 
             # Estimate difficulty parameters for each image
             if self.learn_image_params:
-                for image in self.images.itervalues():
+                for image in self.images.values():
                     image.estimate_parameters(
                         avoid_if_finished=avoid_if_finished)
 
             # Estimate skill parameters for each worker
             if self.learn_worker_params:
-                for worker in self.workers.itervalues():
+                for worker in self.workers.values():
                     worker.estimate_parameters(avoid_if_finished=avoid_if_finished)
 
             # Estimate response probability parameters for each worker
-            for image in self.images.itervalues():
-                for label in image.z.itervalues():
+            for image in self.images.values():
+                for label in image.z.values():
                     label.estimate_parameters()
 
             # Check the new log likelihood of the dataset and finish on
@@ -453,7 +453,7 @@ class CrowdDataset(object):
         image is finished.
         """
         finished = {}
-        for image_id, image in self.images.iteritems():
+        for image_id, image in self.images.items():
             finished[image_id] = image.check_finished(
                 set_finished=set_finished)
         return finished
@@ -467,7 +467,7 @@ class CrowdDataset(object):
         """
 
         num = 0
-        for image_id, image in self.images.iteritems():
+        for image_id, image in self.images.items():
 
             if image.z is None:
                 continue
@@ -503,7 +503,7 @@ class CrowdDataset(object):
         """
 
         num = 0
-        for image in self.images.itervalues():
+        for image in self.images.values():
             num += image.num_annotations()
         return num
 
@@ -514,7 +514,7 @@ class CrowdDataset(object):
             return 0
 
         r = 0.
-        for image in self.images.itervalues():
+        for image in self.images.values():
             r += image.risk
         return r / len(self.images)
 
@@ -558,7 +558,7 @@ class CrowdDataset(object):
 
         err = 0.
         num_images = 0
-        for image_id, gt_image in gt_dataset.images.iteritems():
+        for image_id, gt_image in gt_dataset.images.items():
 
             image = self.images[image_id]
 
@@ -615,10 +615,18 @@ class CrowdDataset(object):
                 for anno in annos:
                     try:
                         t = datetime.datetime.strptime(anno['created_at'],
-                                                       '%Y-%m-%dT%H:%M:%S.%fZ')
+                                                       '%Y-%m-%d %H:%M:%S %Z')
                     except ValueError:
-                        t = datetime.datetime.strptime(anno['created_at'],
-                                                       '%Y-%m-%d %H:%M:%S')
+                        try:
+                            t = datetime.datetime.strptime(anno['created_at'],
+                                                           '%Y-%m-%dT%H:%M:%S.%f%z')
+                        except ValueError:
+                            try:
+                                t = datetime.datetime.strptime(anno['created_at'],
+                                                               '%Y-%m-%d %H:%M:%S')
+                            except ValueError:
+                                t = datetime.datetime.strptime(anno['created_at'],
+                                                               '%Y-%m-%d %H:%M:%S.%f')
                     anno['time'] = t
                 annos.sort(key=lambda x: x['time'])
                 for anno in annos:

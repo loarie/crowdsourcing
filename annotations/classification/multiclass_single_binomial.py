@@ -258,7 +258,7 @@ class CrowdDatasetMulticlassSingleBinomial(CrowdDataset):
 
         # Create a node prior vector
         node_priors = np.zeros(num_nodes, dtype=np.float32)
-        for integer_id in xrange(num_nodes):
+        for integer_id in range(num_nodes):
             k = integer_id_to_orig_node_key[integer_id]
             node = self.taxonomy.nodes[k]
             node_priors[integer_id] = node.data['prob']
@@ -268,7 +268,7 @@ class CrowdDatasetMulticlassSingleBinomial(CrowdDataset):
         # Store the paths from the root node to each other node.
         # NOTE: this is redundant with path_to_node below.
         root_to_node_path_list = {}
-        for integer_id in xrange(num_nodes):
+        for integer_id in range(num_nodes):
             k = integer_id_to_orig_node_key[integer_id]
             node = self.taxonomy.nodes[k]
 
@@ -289,7 +289,7 @@ class CrowdDatasetMulticlassSingleBinomial(CrowdDataset):
         # parent index in the skill vector
         internal_node_integer_id_to_skill_vector_index = {}
         skill_vector_index = 0
-        for integer_id in xrange(num_nodes):
+        for integer_id in range(num_nodes):
             k = integer_id_to_orig_node_key[integer_id]
             node = self.taxonomy.nodes[k]
             if not node.is_leaf:
@@ -301,7 +301,7 @@ class CrowdDatasetMulticlassSingleBinomial(CrowdDataset):
         # And we want an array of size [num_nodes -1] that we will use to index into the skill vector
         # when computing the N vector
         skill_vector_N_indices = np.zeros([num_nodes -1], dtype=np.int32)
-        for integer_id in xrange(1, num_nodes):
+        for integer_id in range(1, num_nodes):
             k = integer_id_to_orig_node_key[integer_id]
             node = self.taxonomy.nodes[k]
             parent_node = node.parent
@@ -333,7 +333,7 @@ class CrowdDatasetMulticlassSingleBinomial(CrowdDataset):
         # For each child node this stores the parent index
         # This is used to construct the N matrix for workers.
         parent_indices = [] # [num_nodes -1]
-        for integer_id in xrange(num_nodes):
+        for integer_id in range(num_nodes):
             k = integer_id_to_orig_node_key[integer_id]
             node = self.taxonomy.nodes[k]
             if not node.is_root:
@@ -345,12 +345,12 @@ class CrowdDatasetMulticlassSingleBinomial(CrowdDataset):
 
 
         # sanity check that the parent indices are increasing
-        for i in xrange(1, num_nodes-1):
+        for i in range(1, num_nodes-1):
             assert parent_indices[i-1] <= parent_indices[i]
 
         # For each child node, store its level
         levels = [] # [num_nodes -1]
-        for integer_id in xrange(num_nodes):
+        for integer_id in range(num_nodes):
             k = integer_id_to_orig_node_key[integer_id]
             node = self.taxonomy.nodes[k]
             if not node.is_root:
@@ -362,7 +362,7 @@ class CrowdDatasetMulticlassSingleBinomial(CrowdDataset):
 
         # For each child node, store the path to the node, padded with -1
         path_to_node = np.zeros([num_nodes-1, max_path_length], dtype=np.int32)
-        for integer_id in xrange(1, num_nodes):
+        for integer_id in range(1, num_nodes):
             k = integer_id_to_orig_node_key[integer_id]
             node = self.taxonomy.nodes[k]
             ancestors = [orig_node_key_to_integer_id[a.key] for a in node.ancestors]
@@ -395,7 +395,7 @@ class CrowdDatasetMulticlassSingleBinomial(CrowdDataset):
         current_M_index = 0 # The negative 1 is taken into acount here.
         current_A_index = 0 # The negative 1 is taken into acount here.
         current_block_index = 0
-        for integer_id in xrange(1, num_nodes):
+        for integer_id in range(1, num_nodes):
             k = integer_id_to_orig_node_key[integer_id]
             node = self.taxonomy.nodes[k]
 
@@ -445,7 +445,7 @@ class CrowdDatasetMulticlassSingleBinomial(CrowdDataset):
 
         cur_block_index = 0
         skill_vector_index = 0
-        for integer_id in xrange(num_nodes):
+        for integer_id in range(num_nodes):
             k = integer_id_to_orig_node_key[integer_id]
             parent_node = self.taxonomy.nodes[k]
             if not parent_node.is_leaf:
@@ -483,7 +483,7 @@ class CrowdDatasetMulticlassSingleBinomial(CrowdDataset):
         assert len(set(M_incorrect_indices).intersection(M_correct_indices)) == 0
         M_indices = M_incorrect_indices + M_correct_indices
         M_indices.sort()
-        assert M_indices == range(scs)
+        assert range(min(M_indices), max(M_indices) + 1) == range(scs)
 
         self.skill_vector_correct_read_indices = np.array(skill_vector_correct_read_indices, np.intp)
         self.M_correct_indices = np.array(M_correct_indices, np.intp)
@@ -540,7 +540,7 @@ class CrowdDatasetMulticlassSingleBinomial(CrowdDataset):
         worker_sample_counts = {} # worker id to the number of annotations we have sampled
         max_worker_sample = 20
 
-        for image_id, image in self.images.iteritems():
+        for image_id, image in self.images.items():
 
             has_cv = 0
             if self.cv_worker and self.cv_worker.id in image.z:
@@ -602,7 +602,7 @@ class CrowdDatasetMulticlassSingleBinomial(CrowdDataset):
 
         # Class probabilities (leaf node probabilities)
         num_images = float(np.sum(class_dist.values()))
-        for y, count in class_dist.iteritems():
+        for y, count in class_dist.items():
             num = self.class_probs_prior[y] * self.class_probs_prior_beta + count
             denom = self.class_probs_prior_beta + num_images
             self.class_probs[y] = np.clip(num / denom, a_min=0.00000001, a_max=0.999999)
@@ -618,7 +618,7 @@ class CrowdDatasetMulticlassSingleBinomial(CrowdDataset):
         # Create a node prior vector
         num_nodes = len(self.taxonomy.nodes)
         node_priors = np.zeros(num_nodes, dtype=np.float32)
-        for integer_id in xrange(num_nodes):
+        for integer_id in range(num_nodes):
             k = self.integer_id_to_orig_node_key[integer_id]
             node = self.taxonomy.nodes[k]
             node_priors[integer_id] = node.data['prob']
@@ -645,8 +645,8 @@ class CrowdDatasetMulticlassSingleBinomial(CrowdDataset):
             worker_sample_counts = {} # worker id to the number of annotations we have sampled
             max_worker_sample = 20
 
-            for worker_id, worker in self.workers.iteritems():
-                for image in worker.images.itervalues():
+            for worker_id, worker in self.workers.items():
+                for image in worker.images.values():
 
                     if worker_id not in worker_sample_counts:
                         worker_sample_counts[worker_id] = 0
@@ -659,7 +659,7 @@ class CrowdDatasetMulticlassSingleBinomial(CrowdDataset):
                         worker_t = image.z.keys().index(worker_id)
                         if worker_t > 0:
                             worker_label = image.z[worker_id].label
-                            prev_anno = image.z.values()[worker_t - 1]
+                            prev_anno = list(image.z.values())[worker_t - 1]
 
                             prob_trust_denom += 1.
                             if worker_label == prev_anno.label:
@@ -668,7 +668,7 @@ class CrowdDatasetMulticlassSingleBinomial(CrowdDataset):
                         # Assume all of the previous labels are treated
                         # independently
                         worker_label = image.z[worker_id].label
-                        for prev_worker_id, prev_anno in image.z.iteritems():
+                        for prev_worker_id, prev_anno in image.z.items():
                             if prev_worker_id == worker_id:
                                 break
                             if not prev_anno.is_computer_vision() or self.naive_computer_vision:
@@ -685,7 +685,7 @@ class CrowdDatasetMulticlassSingleBinomial(CrowdDataset):
         """Pass on the dataset-wide worker skill priors to the workers.
         """
 
-        for worker in self.workers.itervalues():
+        for worker in self.workers.values():
             if avoid_if_finished and worker.finished:
                 continue
 
@@ -746,12 +746,12 @@ class CrowdImageMulticlassSingleBinomial(CrowdImage):
         # Collect the relevant data from each worker to build the prob_prior_responses tensor.
 
         ncv = self.params.naive_computer_vision
-        num_workers = sum([1 for anno in self.z.itervalues() if not anno.is_computer_vision() or ncv])
+        num_workers = sum([1 for anno in self.z.values() if not anno.is_computer_vision() or ncv])
 
         worker_labels = np.empty(num_workers, dtype=np.int32)
 
         w = 0
-        for anno in self.z.itervalues():
+        for anno in self.z.values():
             if not anno.is_computer_vision() or ncv:
                 integer_label = self.params.orig_node_key_to_integer_id[anno.label]
                 worker_labels[w] = integer_label
@@ -763,13 +763,13 @@ class CrowdImageMulticlassSingleBinomial(CrowdImage):
         # Collect the relevant data from each worker to build the prob_prior_responses tensor.
 
         ncv = self.params.naive_computer_vision
-        num_workers = sum([1 for anno in self.z.itervalues() if not anno.is_computer_vision() or ncv])
+        num_workers = sum([1 for anno in self.z.values() if not anno.is_computer_vision() or ncv])
 
         worker_labels = np.empty(num_workers, dtype=np.int32)
         worker_prob_trust = np.empty(num_workers, dtype=np.float32)
 
         w = 0
-        for anno in self.z.itervalues():
+        for anno in self.z.values():
             if not anno.is_computer_vision() or ncv:
                 integer_label = self.params.orig_node_key_to_integer_id[anno.label]
                 worker_labels[w] = integer_label
@@ -787,14 +787,14 @@ class CrowdImageMulticlassSingleBinomial(CrowdImage):
         num_inner_nodes = inner_node_indices.shape[0]
 
         ncv = self.params.naive_computer_vision
-        num_workers = sum([1 for anno in self.z.itervalues() if not anno.is_computer_vision() or ncv])
+        num_workers = sum([1 for anno in self.z.values() if not anno.is_computer_vision() or ncv])
 
         # Collect the worker labels, P and R
         worker_labels = np.empty(num_workers, dtype=np.int32)
         P = np.empty([num_workers, self.params.scs], dtype=np.float32)
         R = np.empty([num_workers, num_nodes - 1], dtype=np.float32)
         w = 0
-        for anno in self.z.itervalues():
+        for anno in self.z.values():
             if not anno.is_computer_vision() or ncv:
                 integer_label = self.params.orig_node_key_to_integer_id[anno.label]
                 worker_labels[w] = integer_label
@@ -924,7 +924,7 @@ class CrowdImageMulticlassSingleBinomial(CrowdImage):
             prob_prior_responses[1] = np.where(node_labels == previous_label, pt, ppnt)
 
             # Fill in the subsequent rows for each additional worker
-            for wind in xrange(2, num_workers):
+            for wind in range(2, num_workers):
 
                 previous_label = worker_labels[wind-1] -1 # minus 1 to account for the loss of the root node
                 worker_label = worker_labels[wind]
@@ -963,7 +963,7 @@ class CrowdImageMulticlassSingleBinomial(CrowdImage):
         M = np.empty([num_workers, self.params.scs], dtype=np.float32)
         N = np.empty([num_workers, num_nodes -1], dtype=np.float32)
         w = 0
-        for anno in self.z.itervalues():
+        for anno in self.z.values():
             if not anno.is_computer_vision() or ncv:
                 anno.worker.build_M_and_N(M[w], N[w])
                 w += 1
@@ -1060,7 +1060,7 @@ class CrowdImageMulticlassSingleBinomial(CrowdImage):
         # if self.id == "13710142": #"4892227": "8071298": #
 
         #     print "Worker labels"
-        #     for anno in self.z.itervalues():
+        #     for anno in self.z.values():
         #         print "%s labeled it as %d (key=%s) (%s leaf)" % (str(anno.worker.id), self.params.orig_node_key_to_integer_id[anno.label] - 1, anno.label, "IS" if self.params.taxonomy.nodes[anno.label].is_leaf else "NOT")
 
         #     #print np.argmax(class_log_likelihoods)
@@ -1219,7 +1219,7 @@ class CrowdImageMulticlassSingleBinomial(CrowdImage):
 
         node_probs = np.zeros(self.params.node_priors.shape[0], dtype=np.float32)
 
-        for zero_indexed_leaf_integer_id in xrange(leaf_node_probabilities.shape[0]):
+        for zero_indexed_leaf_integer_id in range(leaf_node_probabilities.shape[0]):
             # Map the 0-indexed leaf id to its node integer id
             y = self.params.leaf_integer_ids[zero_indexed_leaf_integer_id]
             path_to_y = self.params.root_to_node_path_list[y]
@@ -1333,7 +1333,7 @@ class CrowdWorkerMulticlassSingleBinomial(CrowdWorker):
 
         internal_node_integer_id_to_skill_vector_index = self.params.internal_node_integer_id_to_skill_vector_index
 
-        for image in self.images.itervalues():
+        for image in self.images.values():
 
             if len(image.z) <= 1:
                 continue
@@ -1427,7 +1427,7 @@ class CrowdWorkerMulticlassSingleBinomial(CrowdWorker):
 
         # Placeholder for skills
         total_num_correct = 0.
-        for image in self.images.itervalues():
+        for image in self.images.values():
             y = image.y.label
             z = image.z[self.id].label
             if y == z:
@@ -1440,7 +1440,7 @@ class CrowdWorkerMulticlassSingleBinomial(CrowdWorker):
 
         # Estimate the probability of this worker choosing a particular node
         node_counts = np.zeros_like(self.params.node_priors)
-        for image in self.images.itervalues():
+        for image in self.images.values():
             z_integer_id = self.params.orig_node_key_to_integer_id[image.z[self.id].label]
             z_node_list = self.params.root_to_node_path_list[z_integer_id]
             node_counts[z_node_list] += 1
@@ -1475,17 +1475,17 @@ class CrowdWorkerMulticlassSingleBinomial(CrowdWorker):
             skill_perception_counts_num = np.zeros_like(self.params.pooled_prob_correct_vector)
             skill_perception_counts_denom = np.zeros_like(self.params.pooled_prob_correct_vector)
 
-            for image in self.images.itervalues():
+            for image in self.images.values():
 
                 if self.params.recursive_trust:
 
                     # Is there a previous response?
-                    our_t = image.z.keys().index(self.id)
+                    our_t = list(image.z.keys()).index(self.id)
                     if our_t > 0:
 
 
                         our_label = image.z[self.id].label
-                        prev_label = image.z.values()[our_t - 1].label
+                        prev_label = list(image.z.values())[our_t - 1].label
 
                         y_integer_id = self.params.orig_node_key_to_integer_id[our_label]
                         z_integer_id = self.params.orig_node_key_to_integer_id[prev_label]
@@ -1542,12 +1542,12 @@ class CrowdWorkerMulticlassSingleBinomial(CrowdWorker):
             # This is just a multinomial over the children
             # Estimate the probability of other workers choosing a particular node
             node_counts = np.zeros_like(self.params.node_priors)
-            for image in self.images.itervalues():
+            for image in self.images.values():
 
-                our_t = image.z.keys().index(self.id)
+                our_t = list(image.z.keys()).index(self.id)
                 if our_t > 0:
                     for t in range(our_t):
-                        prev_label = image.z.values()[t].label
+                        prev_label = list(image.z.values())[t].label
 
                         z_integer_id = self.params.orig_node_key_to_integer_id[prev_label]
                         z_node_list = self.params.root_to_node_path_list[z_integer_id]

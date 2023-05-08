@@ -80,7 +80,7 @@ class Node(object):
         """ jsonify our data, specifically handling numpy arrays.
         """
         json_data = {}
-        for key, value in self.data.iteritems():
+        for key, value in self.data.items():
             if isinstance(value, np.ndarray):
                 value = value.tolist()
             json_data[key] = value
